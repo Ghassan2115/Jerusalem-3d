@@ -1,0 +1,656 @@
+:root {
+  --primary: #1E3A8A;
+  --primary-dark: #1E40AF;
+  --gold: #FBBF24;
+  --gold-dark: #D97706;
+  --green: #10B981;
+  --green-dark: #047857;
+  --red: #EF4444;
+  --red-dark: #B91C1C;
+  --bg-color: #FDF6E3;
+  --font: 'Tajawal', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg-color);
+  overflow: hidden;
+}
+
+/* Utilities */
+.hidden {
+  display: none !important;
+}
+
+.screen {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.screen.active {
+  display: flex;
+  opacity: 1;
+}
+
+/* Map Screen */
+#map-screen {
+  background: #000;
+  overflow: hidden;
+}
+
+#blurred-bg {
+  position: absolute;
+  inset: -10%;
+  background: url('/new_map.jpg') center/cover;
+  filter: blur(30px) brightness(0.5);
+  z-index: 0;
+}
+
+#map-wrapper {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#map-container {
+  position: relative;
+  width: 100vw;
+  height: 56.25vw;
+  max-height: 100vh;
+  max-width: 177.7778vh;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
+}
+
+#map-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* تمديد الخريطة لملء الشاشة بالكامل بدون أي فراغات */
+
+/* Game Top Bar */
+.top-bar {
+  position: absolute;
+  top: 25px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(to bottom, var(--primary), var(--primary-dark));
+  border: 4px solid var(--gold);
+  border-radius: 40px;
+  padding: 12px 50px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  color: white;
+  font-weight: 900;
+  font-size: 1.8rem;
+  z-index: 100;
+  text-shadow: 0 3px 5px rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+/* Candy-Crush Style Pins */
+.map-pin {
+  position: absolute;
+  transform: translate(-50%, -50%) rotateX(-45deg);
+  transform-style: preserve-3d;
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #FDE047, var(--gold-dark));
+  border: 5px solid white;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4), inset 0 -6px 12px rgba(217, 119, 6, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  z-index: 10;
+  transition: 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.map-pin:hover {
+  transform: translate(-50%, -60%) rotateX(-45deg) scale(1.15);
+  z-index: 20;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.5), inset 0 -6px 12px rgba(217, 119, 6, 0.6);
+}
+
+.pin-label {
+  position: absolute;
+  bottom: -45px;
+  background: white;
+  color: var(--gold-dark);
+  padding: 6px 18px;
+  border-radius: 20px;
+  font-size: 1.1rem;
+  font-weight: 900;
+  white-space: nowrap;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  border: 3px solid var(--gold-dark);
+}
+
+/* Station Screen */
+.st-bg {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  filter: blur(20px) brightness(0.3);
+  z-index: -1;
+  transform: scale(1.1);
+}
+
+.btn-back {
+  position: absolute;
+  top: 25px;
+  right: 25px;
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border: 2px solid white;
+  color: white;
+  padding: 12px 25px;
+  border-radius: 25px;
+  font-weight: 900;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: 0.2s;
+  z-index: 100;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.btn-back:hover {
+  background: white;
+  color: var(--primary-dark);
+  transform: scale(1.05);
+}
+
+.station-board { width: 95%; max-width: 1700px; height: 92vh;
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: 35px;
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+  display: flex;
+  border: 8px solid var(--gold);
+  overflow: hidden;
+}
+
+.bouncy {
+  animation: bounceIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.6) translateY(100px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.board-right {
+  flex: 1;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: #FEF3C7;
+  border-left: 5px dashed #FCD34D;
+}
+
+.st-photo {
+  width: 100%;
+  flex: 1;
+  object-fit: cover;
+  border-radius: 25px;
+  border: 6px solid white;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.board-left {
+  flex: 1.3;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  background: white;
+}
+
+.st-game-title { font-size: 4.5rem;
+  color: var(--primary-dark);
+  font-weight: 900;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 0 #93C5FD;
+}
+
+.st-game-desc { font-size: 2.2rem;
+  color: #4B5563;
+  margin-bottom: 30px;
+  font-weight: 800;
+  line-height: 1.6;
+}
+
+/* Quests/Tasks styling */
+.quests-container { background: #EFF6FF; border-radius: 25px; padding: 50px;
+  border: 4px solid #BFDBFE;
+  flex: 1;
+}
+
+.quests-title {
+  color: #2563EB;
+  font-size: 2rem;
+  font-weight: 900;
+  margin-bottom: 20px;
+}
+
+.team-quest { background: white; padding: 40px 50px;
+  border-radius: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+  border-right: 8px solid #2563EB;
+}
+
+.team-quest.red {
+  border-right-color: var(--red);
+}
+
+.team-quest.gold {
+  border-right-color: var(--gold-dark);
+}
+
+.team-quest h4 { font-size: 2.6rem;
+  color: var(--primary-dark);
+  margin-bottom: 10px;
+  font-weight: 900;
+}
+
+.team-quest p { font-size: 2rem; line-height: 1.8;
+  color: #333;
+  font-weight: 800;
+  line-height: 1.6;
+}
+
+/* Chunky Game Buttons */
+.btn-game {
+  width: 100%;
+  border: none;
+  font-family: inherit;
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: white;
+  padding: 18px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: 0.1s;
+  text-shadow: 0 2px 2px rgba(0, 0, 0, 0.3);
+  outline: none;
+}
+
+.btn-blue {
+  background: #3B82F6;
+  border-bottom: 8px solid #1D4ED8;
+}
+
+.btn-blue:active {
+  transform: translateY(6px);
+  border-bottom-width: 2px;
+}
+
+.btn-gold {
+  background: var(--gold);
+  border-bottom: 8px solid var(--gold-dark);
+  color: #78350F;
+  text-shadow: none;
+}
+
+.btn-gold:active {
+  transform: translateY(6px);
+  border-bottom-width: 2px;
+}
+
+.btn-green {
+  background: var(--green);
+  border-bottom: 8px solid var(--green-dark);
+}
+
+.btn-green:active {
+  transform: translateY(6px);
+  border-bottom-width: 2px;
+}
+
+.btn-ghost {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  background: transparent;
+  border: none;
+  color: rgba(0, 0, 0, 0.2);
+  font-size: 1.8rem;
+  cursor: pointer;
+  z-index: 100;
+  transition: 0.2s;
+}
+
+.btn-ghost:hover {
+  color: rgba(0, 0, 0, 0.6);
+  transform: rotate(45deg);
+}
+
+/* Quiz & Teacher Modals */
+.quiz-modal {
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  z-index: 200;
+}
+
+.quiz-card {
+  background: linear-gradient(135deg, var(--primary), #312E81);
+  border: 6px solid var(--gold);
+  border-radius: 40px;
+  padding: 40px;
+  width: 90%;
+  max-width: 700px;
+  color: white;
+  text-align: center;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+}
+
+.teacher-card {
+  background: white;
+  border-color: var(--primary);
+  color: #333;
+  text-align: right;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.quiz-progress {
+  display: inline-block;
+  background: rgba(255, 255, 255, 0.2);
+  padding: 5px 20px;
+  border-radius: 20px;
+  font-weight: 900;
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}
+
+.q-text {
+  font-size: 2.2rem;
+  font-weight: 900;
+  margin-bottom: 30px;
+  text-shadow: 0 3px 5px rgba(0, 0, 0, 0.4);
+  line-height: 1.4;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.quiz-opt {
+  background: rgba(255, 255, 255, 0.1);
+  border: 4px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  padding: 18px;
+  border-radius: 20px;
+  font-size: 1.4rem;
+  font-weight: 900;
+  cursor: pointer;
+  transition: 0.2s;
+  text-align: center;
+  font-family: inherit;
+}
+
+.quiz-opt:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: white;
+  transform: scale(1.02);
+}
+
+.quiz-opt.correct {
+  background: var(--green);
+  border-color: var(--green-dark);
+}
+
+.quiz-opt.wrong {
+  background: var(--red);
+  border-color: var(--red-dark);
+}
+
+.feedback-msg {
+  margin-top: 25px;
+  padding: 15px;
+  border-radius: 15px;
+  font-size: 1.5rem;
+  font-weight: 900;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* Teacher panel internals */
+.btn-icon {
+  background: #eee;
+  border: none;
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #555;
+  transition: 0.2s;
+}
+
+.btn-icon:hover {
+  background: #ddd;
+  transform: rotate(90deg);
+}
+
+.t-select {
+  width: 100%;
+  padding: 15px;
+  border-radius: 15px;
+  border: 3px solid #ddd;
+  font-family: inherit;
+  font-size: 1.2rem;
+  font-weight: 800;
+  background: #fafafa;
+  margin-bottom: 20px;
+  outline: none;
+}
+
+.t-questions-list {
+  overflow-y: auto;
+  padding-right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  flex: 1;
+}
+
+.t-q-card {
+  background: #f8fafc;
+  border: 3px solid #e2e8f0;
+  border-radius: 20px;
+  padding: 20px;
+  position: relative;
+}
+
+.t-input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  border: 2px solid #cbd5e1;
+  border-radius: 12px;
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: bold;
+  background: white;
+}
+
+.t-input:focus {
+  border-color: var(--primary);
+  outline: none;
+}
+
+.btn-del {
+  background: var(--red);
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Welcome Splash Screen */
+#welcome-screen {
+  z-index: 500;
+  background: #000;
+  overflow: hidden;
+}
+
+.welcome-bg {
+  position: absolute;
+  inset: 0;
+  background: url('/new_map.jpg') center/cover;
+  filter: blur(8px) brightness(0.5);
+  transform: scale(1.1);
+  animation: slowPan 25s infinite alternate linear;
+  z-index: -1;
+}
+
+@keyframes slowPan {
+  0% {
+    background-position: left center;
+  }
+
+  100% {
+    background-position: right center;
+  }
+}
+
+.welcome-content {
+  position: relative;
+  z-index: 10;
+  text-align: center;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+.welcome-title {
+  font-size: 6rem;
+  font-weight: 900;
+  color: var(--gold);
+  text-shadow: 0 10px 20px rgba(0, 0, 0, 0.8);
+  margin-bottom: 20px;
+  letter-spacing: 2px;
+}
+
+.welcome-subtitle {
+  font-size: 2.5rem;
+  margin-bottom: 50px;
+  font-weight: 800;
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.8);
+}
+
+/* Completed Map Pins */
+.map-pin.completed {
+  background: radial-gradient(circle at 30% 30%, #A7F3D0, var(--green));
+  border-color: white;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5), 0 0 20px var(--green);
+}
+
+.map-pin.completed .pin-label {
+  background: var(--green-dark);
+  color: white;
+  border-color: white;
+}
+
+.completion-star {
+  position: absolute;
+  top: -20px;
+  right: -25px;
+  font-size: 3.5rem;
+  filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.5));
+  animation: starPop 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 30;
+}
+
+@keyframes starPop {
+  0% {
+    transform: scale(0) rotate(-180deg);
+    opacity: 0;
+  }
+
+  100% {
+    transform: scale(1) rotate(15deg);
+    opacity: 1;
+  }
+}
+
+/* Locked Pins & Treasure Path */
+.map-pin.locked {
+  background: radial-gradient(circle at 30% 30%, #e5e7eb, #9ca3af);
+  border-color: #d1d5db;
+  box-shadow: inset 0 -4px 8px rgba(0, 0, 0, 0.1);
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.map-pin.locked:hover {
+  transform: translate(-50%, -50%) rotateX(-45deg);
+  transform-style: preserve-3d;
+  box-shadow: none;
+  z-index: 5;
+}
+
+/* لا تتحرك عند تمرير الماوس */
+.map-pin.locked .pin-label {
+  background: #9ca3af;
+  color: white;
+  border-color: white;
+  box-shadow: none;
+}
+
+.line-dash {
+  stroke-dasharray: 20, 15;
+  animation: dashAnim 2s linear infinite reverse;
+}
+
+@keyframes dashAnim {
+  to {
+    stroke-dashoffset: 70;
+  }
+}
+
+/* End Screen */
+#end-screen {
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(15px);
+  z-index: 1000;
+}
